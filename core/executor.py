@@ -1,7 +1,7 @@
 import subprocess
 import os
-from config import DOCKER_RUN_COMMAND
-
+import requests  # Добавляем импорт requests
+from config import DOCKER_RUN_COMMAND, SWAGGER_ENDPOINTS, DEFAULT_API_PORT
 
 class Executor:
     def __init__(self, project_root: str):
@@ -10,10 +10,7 @@ class Executor:
         os.makedirs(os.path.dirname(self.log_path), exist_ok=True)
 
     def run_docker_compose(self) -> bool:
-        """
-        Запускает команду из конфига (по умолчанию docker compose up --build).
-        Возвращает True, если контейнеры запустились без критических ошибок.
-        """
+        """Запускает команду из конфига."""
         print(f"🚀 Запуск проекта командой: {DOCKER_RUN_COMMAND}...")
         try:
             process = subprocess.run(
@@ -25,7 +22,6 @@ class Executor:
                 timeout=300
             )
 
-            # Сохраняем весь вывод в лог-файл
             with open(self.log_path, 'w', encoding='utf-8') as f:
                 f.write(process.stdout)
                 f.write("\n--- STDERR ---\n")
@@ -40,10 +36,29 @@ class Executor:
             print(f"❌ Критическая ошибка выполнения: {e}")
             return False
 
+    def check_swagger_availability(self) -> str:
+        """
+        Проверяет доступность Swagger UI.
+        Возвращает URL, если найден, или сообщение об ошибке.
+        """
+        # В реальном сценарии порт может быть в docker-compose.yml, 
+        # здесь используем DEFAULT_API_PORT для базовой проверки.
+        base_url = f"http://localhost:{DEFAULT_API_PORT}"
+        
+        for endpoint in SWAGGER_ENDPOINTS:
+            try:
+                full_url = base_url + endpoint
+                response = requests.get(full_url, timeout=5)
+                if response.status_code == 200:
+                    return full_url
+            except requests.RequestException:
+                continue
+        
+        return "NOT_FOUND"
+
     def get_last_logs(self) -> str:
         """Читает лог последнего запуска."""
         if os.path.exists(self.log_path):
             with open(self.log_path, 'r', encoding='utf-8') as f:
                 return f.read()
         return "Логи отсутствуют."
-        

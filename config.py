@@ -21,3 +21,6 @@ GIT_COMMIT_TEMPLATE = "AI-Engineer: Step {step_number} - {task_description}"
 # Настройки запуска проекта
 DOCKER_RUN_COMMAND = "docker compose up --build"
 # Если используете старый Docker Compose V1, замените на: "docker-compose up --build"
+
+SWAGGER_ENDPOINTS = ["/docs", "/swagger", "/swagger-ui/index.html"]
+DEFAULT_API_PORT = 8000  # Самый частый порт для FastAPI/Python

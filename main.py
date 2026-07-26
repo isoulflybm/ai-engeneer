@@ -151,6 +151,15 @@ def main():
                 print("\n--- Тестирование ---")
                 if executor.run_docker_compose():
                     print("✅ Проект успешно запущен в контейнере!")
+                    
+                    # Проверка Swagger
+                    print("🔍 Проверка доступности Swagger API...")
+                    swagger_url = executor.check_swagger_availability()
+                    if swagger_url != "NOT_FOUND":
+                        print(f"🌟 Документация Swagger доступна по адресу: {swagger_url}")
+                    else:
+                        print("⚠️  Swagger не обнаружен или сервер еще запускается.")
+                        print(f"Попробуйте проверить вручную: http://localhost:8000/docs")
                 else:
                     print("❌ Ошибка при запуске. Используйте режим [Debug].")
 
