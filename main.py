@@ -13,7 +13,8 @@ from agents.developer import DeveloperAgent
 from agents.qa_engineer import QAEngineerAgent
 from agents.documentalist import DocumentalistAgent
 from agents.auditor import AuditorAgent
-from agents.designer import DesignerAgent
+#from agents.designer import DesignerAgent
+from agents.frontend import FrontendAgent
 
 
 def main():
@@ -64,7 +65,8 @@ def main():
     qa_engineer = QAEngineerAgent()
     documentalist = DocumentalistAgent()
     auditor = AuditorAgent()
-    designer = DesignerAgent()
+    #designer = DesignerAgent()
+    frontend = FrontendAgent()
 
     # Главный цикл
     while True:
@@ -79,7 +81,8 @@ def main():
         print("6. [Docs]    - Генерация документации")
         print("7. [Audit]   - Сверка реализации с ТЗ")
         print("8. [EditSpec]- Редактирование ТЗ и перезапуск аудита")
-        print("9. [Design]  - Создание визуального стиля и UI-кита")
+        #print("9. [Design]  - Создание визуального стиля и UI-кита")
+        print("9. [Frontend]- Создание пользовательского интерфейса")
         print("0. [Exit]    - Выход из системы")
         print("=" * 40)
 
@@ -357,27 +360,56 @@ def main():
             # ============================================================
             # РЕЖИМ 9: Design
             # ============================================================
+            #elif choice == "9":
+            #    print("\n--- Дизайн-сессия ---")
+            #    desc = input("Опишите желаемый стиль или нажмите Enter, если используете только картинку: ")
+            #    
+            #    img_path = input("Введите путь к файлу изображения-референса (или Enter для пропуска): ")
+            #    images = [img_path] if img_path and os.path.exists(img_path) else None
+            #    
+            #    context = pm.get_full_context()
+            #    print("🎨 Дизайнер анализирует стиль и создает UI-кит...")
+            #    
+            #    design_code = designer.design_interface(desc, context, images)
+            #    
+            #    print(f"\n--- РЕЗУЛЬТАТ ДИЗАЙНА ---\n{design_code}\n")
+            #    
+            #    if input("Применить этот дизайн к проекту? (y/n): ").lower() == 'y':
+            #        # Дизайнер может выдать несколько файлов, 
+            #        # здесь упрощенно записываем в design_system.md или просим разработчика внедрить.
+            #        pm.apply_code_change("docs/design_system.md", design_code, "Apply UI/UX design system")
+            #        print("✅ Дизайн-система сохранена в docs/design_system.md")
+			#
+            # ============================================================
+            
+
+            # ============================================================
+            # РЕЖИМ 9: Frontend and design
+            # ============================================================
             elif choice == "9":
-                print("\n--- Дизайн-сессия ---")
-                desc = input("Опишите желаемый стиль или нажмите Enter, если используете только картинку: ")
-                
-                img_path = input("Введите путь к файлу изображения-референса (или Enter для пропуска): ")
+                print("\n--- Frontend & UI Development ---")
+                desc = input("Опишите визуальный стиль и функционал интерфейса: ")
+                img_path = input("Путь к референсу (изображению) или Enter: ")
                 images = [img_path] if img_path and os.path.exists(img_path) else None
                 
                 context = pm.get_full_context()
-                print("🎨 Дизайнер анализирует стиль и создает UI-кит...")
+                print("🎨 Frontend-инженер проектирует интерфейс и пишет код...")
                 
-                design_code = designer.design_interface(desc, context, images)
+                ui_changes = frontend.develop_ui(desc, context, images)
                 
-                print(f"\n--- РЕЗУЛЬТАТ ДИЗАЙНА ---\n{design_code}\n")
-                
-                if input("Применить этот дизайн к проекту? (y/n): ").lower() == 'y':
-                    # Дизайнер может выдать несколько файлов, 
-                    # здесь упрощенно записываем в design_system.md или просим разработчика внедрить.
-                    pm.apply_code_change("docs/design_system.md", design_code, "Apply UI/UX design system")
-                    print("✅ Дизайн-система сохранена в docs/design_system.md")
+                if ui_changes:
+                    print("\nПредлагаемые изменения в интерфейсе:")
+                    for path in ui_changes.keys():
+                        print(f"  📄 {path}")
+                    
+                    if input("\nПрименить изменения в проект? (y/n): ").lower() == 'y':
+                        for rel_path, content in ui_changes.items():
+                            pm.apply_code_change(rel_path, content, "UI/UX Improvement")
+                        print("✅ Интерфейс успешно обновлен!")
+                else:
+                    print("❌ Не удалось сгенерировать код интерфейса.")
 
-            # ============================================================
+            
             # РЕЖИМ 0: Exit
             # ============================================================
             elif choice == "0":
